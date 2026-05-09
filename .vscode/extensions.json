@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "editorconfig.editorconfig",
+    "jasonnutter.vscode-codeowners",
+    "joshbolduc.commitlint",
+    "hashicorp.terraform"
+  ],
+  "unwantedRecommendations": []
+}
