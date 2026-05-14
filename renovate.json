@@ -11,6 +11,14 @@
   "customManagers": [
     {
       "customType": "regex",
+      "managerFilePatterns": ["/^\\versions.{tf,tofu}$/"],
+      "matchStrings": ["required_version[^\\s]+=[^\\s]+\">=[^\\s]+(?<currentValue>\\d+\\.\\d+\\.\\d+)\""],
+      "depNameTemplate": "opentofu/opentofu",
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
       "managerFilePatterns": ["/^\\.opentofu-version$/"],
       "matchStrings": ["(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
       "depNameTemplate": "opentofu/opentofu",
