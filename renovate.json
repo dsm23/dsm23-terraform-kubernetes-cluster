@@ -1,0 +1,48 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    "helpers:pinGitHubActionDigestsToSemver",
+    "security:openssf-scorecard",
+    ":approveMajorUpdates",
+    ":enableVulnerabilityAlerts",
+    ":pinAllExceptPeerDependencies"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.opentofu-version$"],
+      "matchStrings": ["(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
+      "depNameTemplate": "opentofu/opentofu",
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "semver"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Apply minimum release age to all relevant datasources with timestamps",
+      "internalChecksFilter": "strict",
+      "matchDatasources": [
+        "github-releases",
+        "github-tags",
+        "terraform-module",
+        "terraform-provider"
+      ],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "Apply minimum release age to docker datasource regardless of timestamps",
+      "internalChecksFilter": "strict",
+      "matchDatasources": ["docker"],
+      "minimumReleaseAge": "3 days",
+      "minimumReleaseAgeBehaviour": "timestamp-optional"
+    },
+    {
+      "matchDatasources": ["terraform-provider", "terraform-module"],
+      "registryUrls": ["https://registry.opentofu.org"]
+    }
+  ],
+  "enabledManagers": ["github-actions", "custom.regex"],
+  "rebaseWhen": "conflicted",
+  "osvVulnerabilityAlerts": true
+}
