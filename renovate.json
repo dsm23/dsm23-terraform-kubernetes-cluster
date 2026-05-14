@@ -11,7 +11,7 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": ["^\\.opentofu-version$"],
+      "managerFilePatterns": ["/^\\.opentofu-version$/"],
       "matchStrings": ["(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
       "depNameTemplate": "opentofu/opentofu",
       "datasourceTemplate": "github-releases",
