@@ -29,6 +29,14 @@ module "next-template" {
   release_namespace = kubernetes_namespace_v1.traefik_namespace.metadata[0].name
 }
 
+module "svelte-kit-template" {
+  depends_on = [module.reverse_proxy]
+
+  source = "./modules/svelte-kit"
+
+  release_namespace = kubernetes_namespace_v1.traefik_namespace.metadata[0].name
+}
+
 module "todos-example" {
   depends_on = [module.reverse_proxy]
 
@@ -37,10 +45,10 @@ module "todos-example" {
   release_namespace = kubernetes_namespace_v1.traefik_namespace.metadata[0].name
 }
 
-module "vite-spa" {
+module "vite-spa-template" {
   depends_on = [module.reverse_proxy]
 
-  source = "./modules/vite"
+  source = "./modules/vite-spa"
 
   release_namespace = kubernetes_namespace_v1.traefik_namespace.metadata[0].name
 }
