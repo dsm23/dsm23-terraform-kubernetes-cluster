@@ -12,7 +12,7 @@
     {
       "customType": "regex",
       "managerFilePatterns": ["/^\\versions.{tf,tofu}$/"],
-      "matchStrings": ["\\s+required_version\\s*=\\s*\">=\\*(?<currentValue>\\d+\\.\\d+\\.\\d+)\""],
+      "matchStrings": ["\\s+required_version\\s*=\\s*\"\\>\\=\\*(?<currentValue>\\d+\\.\\d+\\.\\d+)\""],
       "depNameTemplate": "opentofu/opentofu",
       "datasourceTemplate": "github-releases",
       "versioningTemplate": "semver"
