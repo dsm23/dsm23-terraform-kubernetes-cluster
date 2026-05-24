@@ -29,6 +29,14 @@ module "next-template" {
   release_namespace = kubernetes_namespace_v1.traefik_namespace.metadata[0].name
 }
 
+module "solid-start-template" {
+  depends_on = [module.reverse_proxy]
+
+  source = "./modules/solid-start"
+
+  release_namespace = kubernetes_namespace_v1.traefik_namespace.metadata[0].name
+}
+
 module "svelte-kit-template" {
   depends_on = [module.reverse_proxy]
 
