@@ -15,56 +15,54 @@ resource "kubernetes_namespace_v1" "traefik_namespace" {
   }
 }
 
+locals {
+  ns = kubernetes_namespace_v1.traefik_namespace.metadata[0].name
+}
+
 module "reverse_proxy" {
   source = "./modules/proxy"
 
-  proxy_namespace = kubernetes_namespace_v1.traefik_namespace.metadata[0].name
+  proxy_namespace = local.ns
+}
+
+module "browserless" {
+  source = "./modules/browserless"
+
+  release_namespace = module.reverse_proxy.namespace
 }
 
 module "docuseal" {
-  depends_on = [module.reverse_proxy]
-
   source = "./modules/docuseal"
 
-  release_namespace = kubernetes_namespace_v1.traefik_namespace.metadata[0].name
+  release_namespace = module.reverse_proxy.namespace
 }
 
 module "next-template" {
-  depends_on = [module.reverse_proxy]
-
   source = "./modules/next"
 
-  release_namespace = kubernetes_namespace_v1.traefik_namespace.metadata[0].name
+  release_namespace = module.reverse_proxy.namespace
 }
 
 module "solid-start-template" {
-  depends_on = [module.reverse_proxy]
-
   source = "./modules/solid-start"
 
-  release_namespace = kubernetes_namespace_v1.traefik_namespace.metadata[0].name
+  release_namespace = module.reverse_proxy.namespace
 }
 
 module "svelte-kit-template" {
-  depends_on = [module.reverse_proxy]
-
   source = "./modules/svelte-kit"
 
-  release_namespace = kubernetes_namespace_v1.traefik_namespace.metadata[0].name
+  release_namespace = module.reverse_proxy.namespace
 }
 
 module "todos-example" {
-  depends_on = [module.reverse_proxy]
-
   source = "./modules/todos"
 
-  release_namespace = kubernetes_namespace_v1.traefik_namespace.metadata[0].name
+  release_namespace = module.reverse_proxy.namespace
 }
 
 module "vite-spa-template" {
-  depends_on = [module.reverse_proxy]
-
   source = "./modules/vite-spa"
 
-  release_namespace = kubernetes_namespace_v1.traefik_namespace.metadata[0].name
+  release_namespace = module.reverse_proxy.namespace
 }
