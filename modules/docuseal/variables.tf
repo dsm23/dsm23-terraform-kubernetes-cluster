@@ -1,16 +1,16 @@
 variable "release_version" {
   type        = string
-  default     = "latest"
+  default     = "3.0.2"
   description = "The version of docuseal to deploy."
 }
 
-variable "release_name" {
-  type        = string
-  default     = "docuseal"
-  description = "The name of the docuseal Helm release."
-}
-
-variable "release_namespace" {
+variable "namespace" {
   type        = string
   description = "The namespace where docuseal should be deployed."
+}
+
+variable "hostnames" {
+  type        = list(string)
+  default     = ["docuseal.docker.localhost"]
+  description = "The hostnames supplied to Kubernetes Gateway"
 }

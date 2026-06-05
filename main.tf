@@ -28,41 +28,41 @@ module "reverse_proxy" {
 module "browserless" {
   source = "./modules/browserless"
 
-  release_namespace = module.reverse_proxy.namespace
+  namespace = module.reverse_proxy.namespace
 }
 
 module "docuseal" {
   source = "./modules/docuseal"
 
-  release_namespace = module.reverse_proxy.namespace
+  namespace = module.reverse_proxy.namespace
 }
 
 module "next-template" {
   source = "./modules/next"
 
-  release_namespace = module.reverse_proxy.namespace
+  namespace = module.reverse_proxy.namespace
 }
 
 module "solid-start-template" {
   source = "./modules/solid-start"
 
-  release_namespace = module.reverse_proxy.namespace
+  namespace = module.reverse_proxy.namespace
 }
 
 module "svelte-kit-template" {
   source = "./modules/svelte-kit"
 
-  release_namespace = module.reverse_proxy.namespace
+  namespace = module.reverse_proxy.namespace
 }
 
 module "todos-example" {
   source = "./modules/todos"
 
-  release_namespace = module.reverse_proxy.namespace
+  namespace = module.reverse_proxy.namespace
 }
 
 module "vite-spa-template" {
   source = "./modules/vite-spa"
 
-  release_namespace = module.reverse_proxy.namespace
+  namespace = module.reverse_proxy.namespace
 }

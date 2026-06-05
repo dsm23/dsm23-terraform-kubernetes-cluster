@@ -4,13 +4,13 @@ variable "release_version" {
   description = "The version of vite-spa to deploy."
 }
 
-variable "release_name" {
-  type        = string
-  default     = "vite-spa"
-  description = "The name of the vite-spa Helm release."
-}
-
-variable "release_namespace" {
+variable "namespace" {
   type        = string
   description = "The namespace where vite-spa should be deployed."
+}
+
+variable "hostnames" {
+  type        = list(string)
+  default     = ["vite.docker.localhost"]
+  description = "The hostnames supplied to Kubernetes Gateway"
 }

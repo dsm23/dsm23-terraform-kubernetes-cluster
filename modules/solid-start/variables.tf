@@ -4,13 +4,13 @@ variable "release_version" {
   description = "The version of solid-start to deploy."
 }
 
-variable "release_name" {
-  type        = string
-  default     = "solid-start"
-  description = "The name of the solid-start Helm release."
-}
-
-variable "release_namespace" {
+variable "namespace" {
   type        = string
   description = "The namespace where solid-start should be deployed."
+}
+
+variable "hostnames" {
+  type        = list(string)
+  default     = ["solid.docker.localhost"]
+  description = "The hostnames supplied to Kubernetes Gateway"
 }

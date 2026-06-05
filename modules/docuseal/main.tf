@@ -1,3 +1,10 @@
+locals {
+  name = "docuseal"
+
+  container_port = 3000
+  host_port      = 80
+}
+
 resource "docker_image" "docuseal_image" {
   name          = data.docker_registry_image.docuseal_image.name
   pull_triggers = [data.docker_registry_image.docuseal_image.sha256_digest]
@@ -8,8 +15,8 @@ resource "docker_image" "docuseal_image" {
 
 resource "kubernetes_persistent_volume_claim_v1" "docuseal_pvc" {
   metadata {
-    name      = "docuseal-pvc"
-    namespace = var.release_namespace
+    name      = "${local.name}-pvc"
+    namespace = var.namespace
   }
 
   # k3d only
@@ -28,8 +35,8 @@ resource "kubernetes_persistent_volume_claim_v1" "docuseal_pvc" {
 
 resource "kubernetes_deployment_v1" "docuseal" {
   metadata {
-    name      = "docuseal"
-    namespace = var.release_namespace
+    name      = local.name
+    namespace = var.namespace
   }
 
   spec {
@@ -38,20 +45,20 @@ resource "kubernetes_deployment_v1" "docuseal" {
 
     selector {
       match_labels = {
-        app = "docuseal"
+        app = local.name
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "docuseal"
+          app = local.name
         }
       }
 
       spec {
         volume {
-          name = "docuseal-data"
+          name = "${local.name}-data"
 
           persistent_volume_claim {
             claim_name = kubernetes_persistent_volume_claim_v1.docuseal_pvc.metadata[0].name
@@ -63,13 +70,13 @@ resource "kubernetes_deployment_v1" "docuseal" {
           image = docker_image.docuseal_image.name
 
           port {
-            container_port = 3000
+            container_port = local.container_port
             protocol       = "TCP"
             name           = "http"
           }
 
           volume_mount {
-            name       = "docuseal-data"
+            name       = "${local.name}-data"
             mount_path = "/data"
           }
 
@@ -107,17 +114,17 @@ resource "kubernetes_deployment_v1" "docuseal" {
 
 resource "kubernetes_service_v1" "docuseal_service" {
   metadata {
-    name      = "docuseal-service"
-    namespace = var.release_namespace
+    name      = "${local.name}-service"
+    namespace = var.namespace
   }
   spec {
     type = "ClusterIP"
     selector = {
-      app = "docuseal"
+      app = local.name
     }
     port {
-      port        = 80
-      target_port = kubernetes_deployment_v1.docuseal.spec[0].template[0].spec[0].container[0].port[0].container_port
+      port        = local.host_port
+      target_port = local.container_port
       protocol    = "TCP"
     }
   }
@@ -128,14 +135,14 @@ resource "kubectl_manifest" "docuseal_route" {
     apiVersion = "gateway.networking.k8s.io/v1"
     kind       = "HTTPRoute"
     metadata = {
-      name      = "docuseal-route"
-      namespace = var.release_namespace
+      name      = "${local.name}-route"
+      namespace = var.namespace
     }
     spec = {
       parentRefs = [{
         name = "traefik-gateway"
       }]
-      hostnames = ["docuseal.docker.localhost"]
+      hostnames = var.hostnames
       rules = [{
         matches = [{
           path = {
@@ -164,8 +171,8 @@ resource "kubectl_manifest" "docuseal_route" {
         }]
 
         backendRefs = [{
-          name   = "docuseal-service"
-          port   = 80
+          name   = "${local.name}-service"
+          port   = local.host_port
           weight = 1
         }]
       }]

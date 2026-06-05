@@ -4,13 +4,13 @@ variable "release_version" {
   description = "The version of todos to deploy."
 }
 
-variable "release_name" {
-  type        = string
-  default     = "todos"
-  description = "The name of the todos Helm release."
-}
-
-variable "release_namespace" {
+variable "namespace" {
   type        = string
   description = "The namespace where todos should be deployed."
+}
+
+variable "hostnames" {
+  type        = list(string)
+  default     = ["todos.docker.localhost"]
+  description = "The hostnames supplied to Kubernetes Gateway"
 }
