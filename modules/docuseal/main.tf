@@ -3,6 +3,27 @@ resource "docker_image" "docuseal_image" {
   pull_triggers = [data.docker_registry_image.docuseal_image.sha256_digest]
 
   keep_locally = true
+
+}
+
+resource "kubernetes_persistent_volume_claim_v1" "docuseal_pvc" {
+  metadata {
+    name      = "docuseal-pvc"
+    namespace = var.release_namespace
+  }
+
+  # k3d only
+  wait_until_bound = false
+
+  spec {
+    access_modes = ["ReadWriteOnce"]
+
+    resources {
+      requests = {
+        storage = "5Gi"
+      }
+    }
+  }
 }
 
 resource "kubernetes_deployment_v1" "docuseal" {
@@ -13,6 +34,8 @@ resource "kubernetes_deployment_v1" "docuseal" {
 
   spec {
     replicas = 1
+
+
     selector {
       match_labels = {
         app = "docuseal"
@@ -29,7 +52,10 @@ resource "kubernetes_deployment_v1" "docuseal" {
       spec {
         volume {
           name = "docuseal-data"
-          empty_dir {} # Use persistent_volume_claim {} here for production
+
+          persistent_volume_claim {
+            claim_name = kubernetes_persistent_volume_claim_v1.docuseal_pvc.metadata[0].name
+          }
         }
 
         container {
