@@ -1,3 +1,10 @@
+locals {
+  name = "browserless"
+
+  container_port = 3000
+  host_port      = 80
+}
+
 resource "docker_image" "browserless_image" {
   name          = data.docker_registry_image.browserless_image.name
   pull_triggers = [data.docker_registry_image.browserless_image.sha256_digest]
@@ -7,22 +14,22 @@ resource "docker_image" "browserless_image" {
 
 resource "kubernetes_deployment_v1" "browserless_deployment" {
   metadata {
-    name      = "browserless"
-    namespace = var.release_namespace
+    name      = local.name
+    namespace = var.namespace
   }
 
   spec {
     replicas = 1
     selector {
       match_labels = {
-        app = "browserless"
+        app = local.name
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "browserless"
+          app = local.name
         }
       }
 
@@ -32,7 +39,7 @@ resource "kubernetes_deployment_v1" "browserless_deployment" {
           image = docker_image.browserless_image.name
 
           port {
-            container_port = 3000
+            container_port = local.container_port
             protocol       = "TCP"
             name           = "http"
           }
@@ -71,17 +78,17 @@ resource "kubernetes_deployment_v1" "browserless_deployment" {
 
 resource "kubernetes_service_v1" "browserless_service" {
   metadata {
-    name      = "browserless-service"
-    namespace = var.release_namespace
+    name      = "${local.name}-service"
+    namespace = var.namespace
   }
   spec {
     type = "ClusterIP"
     selector = {
-      app = "browserless"
+      app = local.name
     }
     port {
-      port        = 80
-      target_port = kubernetes_deployment_v1.browserless_deployment.spec[0].template[0].spec[0].container[0].port[0].container_port
+      port        = local.host_port
+      target_port = local.container_port
       protocol    = "TCP"
     }
   }
@@ -92,14 +99,14 @@ resource "kubectl_manifest" "browserless_route" {
     apiVersion = "gateway.networking.k8s.io/v1"
     kind       = "HTTPRoute"
     metadata = {
-      name      = "browserless-route"
-      namespace = var.release_namespace
+      name      = "${local.name}-route"
+      namespace = var.namespace
     }
     spec = {
       parentRefs = [{
         name = "traefik-gateway"
       }]
-      hostnames = ["chromium.browserless.docker.localhost"]
+      hostnames = var.hostnames
       rules = [{
         matches = [{
           path = {
@@ -128,8 +135,8 @@ resource "kubectl_manifest" "browserless_route" {
         }]
 
         backendRefs = [{
-          name   = "browserless-service"
-          port   = 80
+          name   = "${local.name}-service"
+          port   = local.host_port
           weight = 1
         }]
       }]

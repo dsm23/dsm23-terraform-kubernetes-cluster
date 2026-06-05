@@ -4,13 +4,13 @@ variable "release_version" {
   description = "The version of svelte-kit to deploy."
 }
 
-variable "release_name" {
-  type        = string
-  default     = "svelte-kit"
-  description = "The name of the svelte-kit Helm release."
-}
-
-variable "release_namespace" {
+variable "namespace" {
   type        = string
   description = "The namespace where svelte-kit should be deployed."
+}
+
+variable "hostnames" {
+  type        = list(string)
+  default     = ["svelte.docker.localhost"]
+  description = "The hostnames supplied to Kubernetes Gateway"
 }

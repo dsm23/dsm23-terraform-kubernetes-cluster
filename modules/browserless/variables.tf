@@ -1,16 +1,16 @@
 variable "release_version" {
   type        = string
-  default     = "latest"
+  default     = "v2.51.0"
   description = "The version of browserless to deploy."
 }
 
-variable "release_name" {
-  type        = string
-  default     = "browserless"
-  description = "The name of the browserless Helm release."
-}
-
-variable "release_namespace" {
+variable "namespace" {
   type        = string
   description = "The namespace where browserless should be deployed."
+}
+
+variable "hostnames" {
+  type        = list(string)
+  default     = ["chromium.browserless.docker.localhost"]
+  description = "The hostnames supplied to Kubernetes Gateway"
 }

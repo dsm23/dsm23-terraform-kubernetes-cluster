@@ -1,26 +1,35 @@
+locals {
+  name = "todos"
+
+  container_port = 80
+  host_port      = 80
+}
+
 resource "docker_image" "todos_image" {
-  name         = "ghcr.io/dsm23/todomvc-redux-example:latest"
+  name          = data.docker_registry_image.todos_image.name
+  pull_triggers = [data.docker_registry_image.todos_image.sha256_digest]
+
   keep_locally = true
 }
 
 resource "kubernetes_deployment_v1" "todos" {
   metadata {
-    name      = "todos"
-    namespace = var.release_namespace
+    name      = local.name
+    namespace = var.namespace
   }
 
   spec {
     replicas = 1
     selector {
       match_labels = {
-        app = "todos"
+        app = local.name
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "todos"
+          app = local.name
         }
       }
 
@@ -30,7 +39,7 @@ resource "kubernetes_deployment_v1" "todos" {
           image = docker_image.todos_image.name
 
           port {
-            container_port = 80
+            container_port = local.container_port
             protocol       = "TCP"
             name           = "http"
           }
@@ -69,8 +78,8 @@ resource "kubernetes_deployment_v1" "todos" {
 
 resource "kubernetes_service_v1" "todos_service" {
   metadata {
-    name      = "todos-service"
-    namespace = var.release_namespace
+    name      = "${local.name}-service"
+    namespace = var.namespace
   }
   spec {
     type = "ClusterIP"
@@ -78,8 +87,8 @@ resource "kubernetes_service_v1" "todos_service" {
       app = "todos"
     }
     port {
-      port        = 80
-      target_port = kubernetes_deployment_v1.todos.spec[0].template[0].spec[0].container[0].port[0].container_port
+      port        = local.host_port
+      target_port = local.container_port
       protocol    = "TCP"
     }
   }
@@ -90,14 +99,14 @@ resource "kubectl_manifest" "todos_route" {
     apiVersion = "gateway.networking.k8s.io/v1"
     kind       = "HTTPRoute"
     metadata = {
-      name      = "todos-route"
-      namespace = var.release_namespace
+      name      = "${local.name}-route"
+      namespace = var.namespace
     }
     spec = {
       parentRefs = [{
         name = "traefik-gateway"
       }]
-      hostnames = ["todos.docker.localhost"]
+      hostnames = var.hostnames
       rules = [{
         matches = [{
           path = {
@@ -126,8 +135,8 @@ resource "kubectl_manifest" "todos_route" {
         }]
 
         backendRefs = [{
-          name   = "todos-service"
-          port   = 80
+          name   = "${local.name}-service"
+          port   = local.host_port
           weight = 1
         }]
       }]

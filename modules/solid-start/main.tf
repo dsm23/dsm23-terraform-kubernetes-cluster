@@ -1,26 +1,35 @@
+locals {
+  name = "solid-start"
+
+  container_port = 3000
+  host_port      = 80
+}
+
 resource "docker_image" "solid_start_image" {
-  name         = "ghcr.io/dsm23/dsm23-solid-start-template:latest"
+  name          = data.docker_registry_image.solid_start_image.name
+  pull_triggers = [data.docker_registry_image.solid_start_image.sha256_digest]
+
   keep_locally = true
 }
 
 resource "kubernetes_deployment_v1" "solid_start" {
   metadata {
-    name      = "solid-start"
-    namespace = var.release_namespace
+    name      = local.name
+    namespace = var.namespace
   }
 
   spec {
     replicas = 1
     selector {
       match_labels = {
-        app = "solid-start"
+        app = local.name
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "solid-start"
+          app = local.name
         }
       }
 
@@ -30,7 +39,7 @@ resource "kubernetes_deployment_v1" "solid_start" {
           image = docker_image.solid_start_image.name
 
           port {
-            container_port = 3000
+            container_port = local.container_port
             protocol       = "TCP"
             name           = "http"
           }
@@ -69,17 +78,17 @@ resource "kubernetes_deployment_v1" "solid_start" {
 
 resource "kubernetes_service_v1" "solid_start_service" {
   metadata {
-    name      = "solid-start-service"
-    namespace = var.release_namespace
+    name      = "${local.name}-service"
+    namespace = var.namespace
   }
   spec {
     type = "ClusterIP"
     selector = {
-      app = "solid-start"
+      app = local.name
     }
     port {
-      port        = 80
-      target_port = kubernetes_deployment_v1.solid_start.spec[0].template[0].spec[0].container[0].port[0].container_port
+      port        = local.host_port
+      target_port = local.container_port
       protocol    = "TCP"
     }
   }
@@ -90,14 +99,14 @@ resource "kubectl_manifest" "solid_start_route" {
     apiVersion = "gateway.networking.k8s.io/v1"
     kind       = "HTTPRoute"
     metadata = {
-      name      = "solid-start-route"
-      namespace = var.release_namespace
+      name      = "${local.name}-route"
+      namespace = var.namespace
     }
     spec = {
       parentRefs = [{
         name = "traefik-gateway"
       }]
-      hostnames = ["solid.docker.localhost"]
+      hostnames = var.hostnames
       rules = [{
         matches = [{
           path = {
@@ -126,8 +135,8 @@ resource "kubectl_manifest" "solid_start_route" {
         }]
 
         backendRefs = [{
-          name   = "solid-start-service"
-          port   = 80
+          name   = "${local.name}-service"
+          port   = local.host_port
           weight = 1
         }]
       }]

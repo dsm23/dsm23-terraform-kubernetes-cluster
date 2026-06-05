@@ -1,26 +1,35 @@
+locals {
+  name = "vite-spa"
+
+  container_port = 80
+  host_port      = 80
+}
+
 resource "docker_image" "vite_spa_image" {
-  name         = "ghcr.io/dsm23/dsm23-vite-spa-template:latest"
+  name          = data.docker_registry_image.vite_spa_template_image.name
+  pull_triggers = [data.docker_registry_image.vite_spa_template_image.sha256_digest]
+
   keep_locally = true
 }
 
 resource "kubernetes_deployment_v1" "vite_spa" {
   metadata {
-    name      = "vite-spa"
-    namespace = var.release_namespace
+    name      = local.name
+    namespace = var.namespace
   }
 
   spec {
     replicas = 1
     selector {
       match_labels = {
-        app = "vite-spa"
+        app = local.name
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "vite-spa"
+          app = local.name
         }
       }
 
@@ -30,7 +39,7 @@ resource "kubernetes_deployment_v1" "vite_spa" {
           image = docker_image.vite_spa_image.name
 
           port {
-            container_port = 80
+            container_port = local.container_port
             protocol       = "TCP"
             name           = "http"
           }
@@ -70,16 +79,16 @@ resource "kubernetes_deployment_v1" "vite_spa" {
 resource "kubernetes_service_v1" "vite_spa_service" {
   metadata {
     name      = "vite-spa-service"
-    namespace = var.release_namespace
+    namespace = var.namespace
   }
   spec {
     type = "ClusterIP"
     selector = {
-      app = "vite-spa"
+      app = local.name
     }
     port {
-      port        = 80
-      target_port = kubernetes_deployment_v1.vite_spa.spec[0].template[0].spec[0].container[0].port[0].container_port
+      port        = local.host_port
+      target_port = local.container_port
       protocol    = "TCP"
     }
   }
@@ -91,13 +100,13 @@ resource "kubectl_manifest" "vite_spa_route" {
     kind       = "HTTPRoute"
     metadata = {
       name      = "vite-spa-route"
-      namespace = var.release_namespace
+      namespace = var.namespace
     }
     spec = {
       parentRefs = [{
         name = "traefik-gateway"
       }]
-      hostnames = ["vite.docker.localhost"]
+      hostnames = var.hostnames
       rules = [{
         matches = [{
           path = {
@@ -127,7 +136,7 @@ resource "kubectl_manifest" "vite_spa_route" {
 
         backendRefs = [{
           name   = "vite-spa-service"
-          port   = 80
+          port   = local.host_port
           weight = 1
         }]
       }]
