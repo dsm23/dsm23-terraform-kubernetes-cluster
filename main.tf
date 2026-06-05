@@ -21,6 +21,14 @@ module "reverse_proxy" {
   proxy_namespace = kubernetes_namespace_v1.traefik_namespace.metadata[0].name
 }
 
+module "docuseal" {
+  depends_on = [module.reverse_proxy]
+
+  source = "./modules/docuseal"
+
+  release_namespace = kubernetes_namespace_v1.traefik_namespace.metadata[0].name
+}
+
 module "next-template" {
   depends_on = [module.reverse_proxy]
 
