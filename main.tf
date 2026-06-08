@@ -37,6 +37,12 @@ module "docuseal" {
   namespace = module.reverse_proxy.namespace
 }
 
+module "mailpit" {
+  source = "./modules/mailpit"
+
+  namespace = module.reverse_proxy.namespace
+}
+
 module "next-template" {
   source = "./modules/next"
 
