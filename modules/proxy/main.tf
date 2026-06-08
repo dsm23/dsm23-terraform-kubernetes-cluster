@@ -7,7 +7,7 @@ resource "helm_release" "cert_manager" {
   repository = "https://charts.jetstack.io"
   chart      = "cert-manager"
   version    = var.cert_manager_release_version
-  namespace  = var.proxy_namespace
+  namespace  = var.namespace
 
   values = [
     yamlencode({
@@ -21,13 +21,13 @@ resource "helm_release" "traefik" {
   repository = "https://traefik.github.io/charts"
   chart      = "traefik"
   version    = var.traefik_release_version
-  namespace  = var.proxy_namespace
+  namespace  = var.namespace
   # create_namespace = var.traefik_create_namespace
 
   values = [
     templatefile("${path.module}/templates/values.yml.tpl", {
-      gatewayName = var.proxy_gateway_name
-      namespace   = var.proxy_namespace,
+      gatewayName = var.gateway_name
+      namespace   = var.namespace,
       secretName  = local.secret_name
     })
   ]
@@ -37,7 +37,7 @@ resource "kubectl_manifest" "middleware" {
   depends_on = [helm_release.traefik]
 
   yaml_body = templatefile("${path.module}/templates/middleware.yml.tpl", {
-    namespace = var.proxy_namespace
+    namespace = var.namespace
   })
 }
 
@@ -45,7 +45,7 @@ resource "kubectl_manifest" "issuer" {
   depends_on = [helm_release.cert_manager]
 
   yaml_body = templatefile("${path.module}/templates/issuer.yml.tpl", {
-    namespace = var.proxy_namespace
+    namespace = var.namespace
   })
 }
 
@@ -53,7 +53,7 @@ resource "kubectl_manifest" "certificate" {
   depends_on = [helm_release.cert_manager]
 
   yaml_body = templatefile("${path.module}/templates/certificate.yml.tpl", {
-    namespace  = var.proxy_namespace,
+    namespace  = var.namespace,
     secretName = local.secret_name
   })
 }

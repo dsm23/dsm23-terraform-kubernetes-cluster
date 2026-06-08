@@ -1,3 +1,9 @@
+variable "k3s_version" {
+  type        = string
+  default     = "v1.36.0-k3s1"
+  description = "The version of k3s to deploy."
+}
+
 variable "hcloud_token" {
   type        = string
   sensitive   = true
