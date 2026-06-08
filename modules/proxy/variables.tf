@@ -10,6 +10,11 @@ variable "cert_manager_release_version" {
   description = "The version of cert-manager to deploy."
 }
 
+variable "proxy_gateway_name" {
+  type        = string
+  description = "The gateway name in the reverse proxy."
+}
+
 variable "traefik_release_version" {
   type        = string
   default     = "40.0.0"

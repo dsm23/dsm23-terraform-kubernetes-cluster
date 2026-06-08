@@ -26,8 +26,9 @@ resource "helm_release" "traefik" {
 
   values = [
     templatefile("${path.module}/templates/values.yml.tpl", {
-      namespace  = var.proxy_namespace,
-      secretName = local.secret_name
+      gatewayName = var.proxy_gateway_name
+      namespace   = var.proxy_namespace,
+      secretName  = local.secret_name
     })
   ]
 }

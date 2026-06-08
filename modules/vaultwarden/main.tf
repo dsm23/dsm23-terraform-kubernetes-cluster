@@ -1,7 +1,7 @@
 locals {
   name = "vaultwarden"
 
-  container_port = 8000
+  container_port = 80
   host_port      = 80
 }
 
@@ -89,7 +89,7 @@ resource "kubernetes_service_v1" "vaultwarden_service" {
   spec {
     type = "ClusterIP"
     selector = {
-      app = "todos"
+      app = local.name
     }
     port {
       port        = local.host_port
@@ -109,7 +109,7 @@ resource "kubectl_manifest" "vaultwarden_route" {
     }
     spec = {
       parentRefs = [{
-        name = "traefik-gateway"
+        name = var.gateway_name
       }]
       hostnames = var.hostnames
       rules = [{
