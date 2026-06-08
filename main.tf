@@ -11,7 +11,7 @@ resource "k3d_cluster" "k3d" {
 
 resource "kubernetes_namespace_v1" "traefik_namespace" {
   metadata {
-    name = "traefik"
+    name = "production"
   }
 }
 
