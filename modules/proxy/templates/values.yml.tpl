@@ -38,10 +38,11 @@ extraObjects:
     kind: Secret
     metadata:
       name: dashboard-auth-secret
+      namespace: ${namespace}
     type: kubernetes.io/basic-auth
     stringData:
       username: admin
-      password: "password"      # Replace with an Actual Password
+      password: "password" # Replace with an Actual Password
   - apiVersion: traefik.io/v1alpha1
     kind: Middleware
     metadata:
@@ -66,27 +67,26 @@ providers:
 gateway:
   name: traefik-gateway
   listeners:
-    web:           # HTTP listener that matches entryPoint `web`
+    web: # HTTP listener that matches entryPoint `web`
       port: 80
       protocol: HTTP
       namespacePolicy:
         from: All
 
-    websecure:         # HTTPS listener that matches entryPoint `websecure`
+    websecure: # HTTPS listener that matches entryPoint `websecure`
       port: 443
-      protocol: HTTPS  # TLS terminates inside Traefik
+      protocol: HTTPS # TLS terminates inside Traefik
       namespacePolicy:
         from: All
       mode: Terminate
       certificateRefs:
         - kind: Secret
           # name: local-selfsigned-tls  # the Secret we created before the installation
-          name: whoami-tls-le
+          name: ${secretName}
           group: ""
 
 gatewayClass:
   name: traefik
-
 
 # Enable Observability
 logs:
