@@ -65,7 +65,7 @@ providers:
 
 ## Gateway Listeners
 gateway:
-  name: traefik-gateway
+  name: ${gatewayName}
   listeners:
     web: # HTTP listener that matches entryPoint `web`
       port: 80

@@ -104,7 +104,7 @@ resource "kubectl_manifest" "next_template_route" {
     }
     spec = {
       parentRefs = [{
-        name = "traefik-gateway"
+        name = var.gateway_name
       }]
       hostnames = var.hostnames
       rules = [{

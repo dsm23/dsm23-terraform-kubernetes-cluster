@@ -137,7 +137,7 @@ resource "kubectl_manifest" "mailpit_route" {
     }
     spec = {
       parentRefs = [{
-        name = "traefik-gateway"
+        name = var.gateway_name
       }]
       hostnames = var.hostnames
       rules = [{
