@@ -15,7 +15,7 @@ resource "docker_image" "mailpit_image" {
   keep_locally = true
 }
 
-resource "kubernetes_deployment_v1" "mailpit_deployment" {
+resource "kubernetes_deployment_v1" "mailpit" {
   metadata {
     name      = local.name
     namespace = var.namespace
@@ -79,7 +79,7 @@ resource "kubernetes_deployment_v1" "mailpit_deployment" {
 
           liveness_probe {
             http_get {
-              path = "/"
+              path = "/livez"
               port = "http"
             }
             initial_delay_seconds = 5
@@ -88,7 +88,7 @@ resource "kubernetes_deployment_v1" "mailpit_deployment" {
 
           readiness_probe {
             http_get {
-              path = "/"
+              path = "/readyz"
               port = "http"
             }
             initial_delay_seconds = 5
@@ -100,7 +100,7 @@ resource "kubernetes_deployment_v1" "mailpit_deployment" {
   }
 }
 
-resource "kubernetes_service_v1" "mailpit_service" {
+resource "kubernetes_service_v1" "mailpit" {
   metadata {
     name      = "${local.name}-service"
     namespace = var.namespace
@@ -119,10 +119,11 @@ resource "kubernetes_service_v1" "mailpit_service" {
     }
 
     port {
-      name        = "smtp"
-      port        = local.smtp_host_port
-      target_port = local.smtp_container_port
-      protocol    = "TCP"
+      name         = "smtp"
+      port         = local.smtp_host_port
+      target_port  = local.smtp_container_port
+      protocol     = "TCP"
+      app_protocol = "tcp"
     }
   }
 }
@@ -137,7 +138,8 @@ resource "kubectl_manifest" "mailpit_route" {
     }
     spec = {
       parentRefs = [{
-        name = var.gateway_name
+        name        = var.gateway_name
+        sectionName = "websecure"
       }]
       hostnames = var.hostnames
       rules = [{
@@ -168,9 +170,31 @@ resource "kubectl_manifest" "mailpit_route" {
         }]
 
         backendRefs = [{
-          name   = "${local.name}-service"
-          port   = local.host_port
-          weight = 1
+          name = "${local.name}-service"
+          port = local.host_port
+        }]
+      }]
+    }
+  })
+}
+
+resource "kubectl_manifest" "mailpit_smtp_route" {
+  yaml_body = yamlencode({
+    apiVersion = "gateway.networking.k8s.io/v1"
+    kind       = "TCPRoute"
+    metadata = {
+      name      = "${local.name}-smtp-route"
+      namespace = var.namespace
+    }
+    spec = {
+      parentRefs = [{
+        name        = var.gateway_name
+        sectionName = "smtp"
+      }]
+      rules = [{
+        backendRefs = [{
+          name = "${local.name}-service"
+          port = local.smtp_host_port
         }]
       }]
     }

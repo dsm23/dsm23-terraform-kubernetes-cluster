@@ -35,6 +35,8 @@ module "reverse_proxy" {
 }
 
 module "browserless" {
+  depends_on = [module.reverse_proxy]
+
   source = "./modules/browserless"
 
   gateway_name = local.gateway_name
@@ -42,6 +44,8 @@ module "browserless" {
 }
 
 module "docuseal" {
+  depends_on = [module.reverse_proxy]
+
   source = "./modules/docuseal"
 
   gateway_name = local.gateway_name
@@ -49,6 +53,8 @@ module "docuseal" {
 }
 
 module "mailpit" {
+  depends_on = [module.reverse_proxy]
+
   source = "./modules/mailpit"
 
   gateway_name = local.gateway_name
@@ -56,13 +62,26 @@ module "mailpit" {
 }
 
 module "next-template" {
+  depends_on = [module.reverse_proxy]
+
   source = "./modules/next"
 
   gateway_name = local.gateway_name
   namespace    = local.namespace
 }
 
+module "openbao" {
+  depends_on = [module.reverse_proxy]
+
+  source = "./modules/openbao"
+
+  gateway_name = local.gateway_name
+  namespace    = local.namespace
+}
+
 module "solid-start-template" {
+  depends_on = [module.reverse_proxy]
+
   source = "./modules/solid-start"
 
   gateway_name = local.gateway_name
@@ -70,6 +89,8 @@ module "solid-start-template" {
 }
 
 module "svelte-kit-template" {
+  depends_on = [module.reverse_proxy]
+
   source = "./modules/svelte-kit"
 
   gateway_name = local.gateway_name
@@ -77,6 +98,8 @@ module "svelte-kit-template" {
 }
 
 module "todos-example" {
+  depends_on = [module.reverse_proxy]
+
   source = "./modules/todos"
 
   gateway_name = local.gateway_name
@@ -84,6 +107,8 @@ module "todos-example" {
 }
 
 module "vaultwarden" {
+  depends_on = [module.reverse_proxy]
+
   source = "./modules/vaultwarden"
 
   gateway_name = local.gateway_name
@@ -91,6 +116,8 @@ module "vaultwarden" {
 }
 
 module "vite-spa-template" {
+  depends_on = [module.reverse_proxy]
+
   source = "./modules/vite-spa"
 
   gateway_name = local.gateway_name
