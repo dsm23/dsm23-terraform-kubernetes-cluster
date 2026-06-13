@@ -4,12 +4,13 @@ metadata:
   name: ${name}
   namespace: ${namespace}
 spec:
+  isCA: true
+  commonName: ${commonName}
   secretName: ${secretName}
-  dnsNames: ${jsonencode(dnsNames)}
   privateKey:
     algorithm: ECDSA
     rotationPolicy: Always
   issuerRef:
-    name: ${issuerName}
-    kind: Issuer
+    name: ${clusterIssuerName}
+    kind: ClusterIssuer
     group: cert-manager.io

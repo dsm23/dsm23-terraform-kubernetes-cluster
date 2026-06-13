@@ -13,10 +13,21 @@ ports:
           scheme: https
           permanent: true
 
-  # Defines the HTTPS entry point named 'websecure'
   websecure:
     port: 443
     nodePort: 30001
+
+  tls-passthrough:
+    port: 3443
+    nodePort: 30002
+
+  tls:
+    port: 8443
+    nodePort: 30003
+
+  smtp:
+    port: 587
+    nodePort: 30004
 
 # Enables the dashboard in Secure Mode
 api:
@@ -62,31 +73,14 @@ providers:
     enabled: true
   kubernetesGateway:
     enabled: true
+    experimentalChannel: true
 
 ## Gateway Listeners
 gateway:
-  name: ${gatewayName}
-  listeners:
-    web: # HTTP listener that matches entryPoint `web`
-      port: 80
-      protocol: HTTP
-      namespacePolicy:
-        from: All
-
-    websecure: # HTTPS listener that matches entryPoint `websecure`
-      port: 443
-      protocol: HTTPS # TLS terminates inside Traefik
-      namespacePolicy:
-        from: All
-      mode: Terminate
-      certificateRefs:
-        - kind: Secret
-          # name: local-selfsigned-tls  # the Secret we created before the installation
-          name: ${secretName}
-          group: ""
+  enabled: false
 
 gatewayClass:
-  name: traefik
+  enabled: false
 
 # Enable Observability
 logs:

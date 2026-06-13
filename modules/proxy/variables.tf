@@ -21,9 +21,16 @@ variable "namespace" {
   description = "The namespace where Traefik should be deployed"
 }
 
+variable "dns_names" {
+  type        = list(string)
+  default     = ["*.docker.localhost"]
+  description = "The hostnames supplied to Kubernetes Gateway"
+}
+
+
 variable "traefik_release_version" {
   type        = string
-  default     = "40.0.0"
+  default     = "40.3.0"
   description = "The version of Traefik to deploy"
 }
 

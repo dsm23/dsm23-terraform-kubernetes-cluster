@@ -78,7 +78,7 @@ resource "kubernetes_deployment_v1" "vite_spa" {
 
 resource "kubernetes_service_v1" "vite_spa_service" {
   metadata {
-    name      = "vite-spa-service"
+    name      = "${local.name}-service"
     namespace = var.namespace
   }
   spec {
@@ -104,7 +104,8 @@ resource "kubectl_manifest" "vite_spa_route" {
     }
     spec = {
       parentRefs = [{
-        name = var.gateway_name
+        name        = var.gateway_name
+        sectionName = "websecure"
       }]
       hostnames = var.hostnames
       rules = [{
@@ -135,9 +136,8 @@ resource "kubectl_manifest" "vite_spa_route" {
         }]
 
         backendRefs = [{
-          name   = "vite-spa-service"
-          port   = local.host_port
-          weight = 1
+          name = "${local.name}-service"
+          port = local.host_port
         }]
       }]
     }

@@ -109,7 +109,8 @@ resource "kubectl_manifest" "vaultwarden_route" {
     }
     spec = {
       parentRefs = [{
-        name = var.gateway_name
+        name        = var.gateway_name
+        sectionName = "websecure"
       }]
       hostnames = var.hostnames
       rules = [{
@@ -140,9 +141,8 @@ resource "kubectl_manifest" "vaultwarden_route" {
         }]
 
         backendRefs = [{
-          name   = "${local.name}-service"
-          port   = local.host_port
-          weight = 1
+          name = "${local.name}-service"
+          port = local.host_port
         }]
       }]
     }
