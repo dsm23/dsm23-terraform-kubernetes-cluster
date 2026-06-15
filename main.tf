@@ -52,6 +52,15 @@ module "docuseal" {
   namespace    = local.namespace
 }
 
+module "dozzle" {
+  depends_on = [module.reverse_proxy]
+
+  source = "./modules/dozzle"
+
+  gateway_name = local.gateway_name
+  namespace    = local.namespace
+}
+
 module "mailpit" {
   depends_on = [module.reverse_proxy]
 
