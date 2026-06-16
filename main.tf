@@ -61,6 +61,15 @@ module "dozzle" {
   namespace    = local.namespace
 }
 
+module "forgejo" {
+  depends_on = [module.reverse_proxy]
+
+  source = "./modules/forgejo"
+
+  gateway_name = local.gateway_name
+  namespace    = local.namespace
+}
+
 module "mailpit" {
   depends_on = [module.reverse_proxy]
 
