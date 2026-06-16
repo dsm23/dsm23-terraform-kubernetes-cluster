@@ -70,6 +70,15 @@ module "forgejo" {
   namespace    = local.namespace
 }
 
+module "headlamp" {
+  depends_on = [module.reverse_proxy]
+
+  source = "./modules/headlamp"
+
+  gateway_name = local.gateway_name
+  namespace    = local.namespace
+}
+
 module "mailpit" {
   depends_on = [module.reverse_proxy]
 
