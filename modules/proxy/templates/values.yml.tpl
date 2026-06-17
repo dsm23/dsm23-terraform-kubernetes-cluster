@@ -5,6 +5,7 @@ ports:
   web:
     port: 80
     nodePort: 30000
+    # address: "[::]:80"
     # Instructs this entry point to redirect all traffic to the 'websecure' entry point
     http:
       redirections:
@@ -16,6 +17,14 @@ ports:
   websecure:
     port: 443
     nodePort: 30001
+    # http3: {}
+    protocol: TCP
+    # address: "[::]:443"
+
+  # websecure-udp:
+  #   port: 443
+  #   nodePort: 30001
+  #   protocol: UDP
 
   tls-passthrough:
     port: 3443
@@ -70,7 +79,7 @@ ingressClass:
 # Providers tell Traefik where to find routing configuration.
 providers:
   kubernetesIngress:
-    enabled: true
+    enabled: false
   kubernetesGateway:
     enabled: true
     experimentalChannel: true
