@@ -22,5 +22,5 @@ spec:
   ipAllowList:
     sourceRange:
       - 127.0.0.1/32
-      - 10.0.0.0/8  # Typical cluster network range
-      - 192.168.0.0/16  # Common local network range
+      - 10.0.0.0/8 # Typical cluster network range
+      - 192.168.0.0/16 # Common local network range

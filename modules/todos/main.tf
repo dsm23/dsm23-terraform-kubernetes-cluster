@@ -3,6 +3,10 @@ locals {
 
   container_port = 80
   host_port      = 80
+
+  deployment_name        = local.name
+  service_name           = local.name
+  interceptor_route_name = "${local.name}-interceptor-route"
 }
 
 resource "docker_image" "todos_image" {
@@ -14,12 +18,11 @@ resource "docker_image" "todos_image" {
 
 resource "kubernetes_deployment_v1" "todos" {
   metadata {
-    name      = local.name
+    name      = local.deployment_name
     namespace = var.namespace
   }
 
   spec {
-    replicas = 1
     selector {
       match_labels = {
         app = local.name
@@ -78,7 +81,7 @@ resource "kubernetes_deployment_v1" "todos" {
 
 resource "kubernetes_service_v1" "todos_service" {
   metadata {
-    name      = local.name
+    name      = local.service_name
     namespace = var.namespace
   }
   spec {
@@ -95,51 +98,29 @@ resource "kubernetes_service_v1" "todos_service" {
 }
 
 resource "kubectl_manifest" "todos_route" {
-  yaml_body = yamlencode({
-    apiVersion = "gateway.networking.k8s.io/v1"
-    kind       = "HTTPRoute"
-    metadata = {
-      name      = "${local.name}-route"
-      namespace = var.namespace
-    }
-    spec = {
-      parentRefs = [{
-        name        = var.gateway_name
-        sectionName = "websecure"
-      }]
-      hostnames = var.hostnames
-      rules = [{
-        matches = [{
-          path = {
-            type  = "PathPrefix"
-            value = "/"
-          }
+  yaml_body = templatefile("${path.module}/templates/httpRoute.yml.tpl", {
+    name        = "${local.name}-route"
+    namespace   = var.namespace
+    gatewayName = var.gateway_name
+    hostnames   = var.hostnames
+  })
+}
 
-          filters = [
-            {
-              type = "ExtensionRef"
-              extensionRef = {
-                group = "traefik.io"
-                kind  = "Middleware"
-                name  = "secure-headers"
-              }
-            },
-            {
-              type = "ExtensionRef"
-              extensionRef = {
-                group = "traefik.io"
-                kind  = "Middleware"
-                name  = "ip-allowlist"
-              }
-            }
-          ]
-        }]
+resource "kubectl_manifest" "todos_interceptor_route" {
+  yaml_body = templatefile("${path.module}/templates/interceptorRoute.yml.tpl", {
+    name        = local.interceptor_route_name
+    namespace   = var.namespace
+    hostnames   = var.hostnames
+    serviceName = local.service_name
+    hostPort    = local.host_port
+  })
+}
 
-        backendRefs = [{
-          name = local.name
-          port = local.host_port
-        }]
-      }]
-    }
+resource "kubectl_manifest" "todos_scaled_object" {
+  yaml_body = templatefile("${path.module}/templates/scaledObject.yml.tpl", {
+    name             = "${local.name}-scaled-object"
+    namespace        = var.namespace
+    deploymentName   = local.name
+    interceptorRoute = local.interceptor_route_name
   })
 }

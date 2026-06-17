@@ -34,8 +34,16 @@ module "reverse_proxy" {
   namespace    = local.namespace
 }
 
-module "browserless" {
+module "keda" {
   depends_on = [module.reverse_proxy]
+
+  source = "./modules/keda"
+
+  namespace = local.namespace
+}
+
+module "browserless" {
+  depends_on = [module.keda]
 
   source = "./modules/browserless"
 
@@ -44,7 +52,7 @@ module "browserless" {
 }
 
 module "docuseal" {
-  depends_on = [module.reverse_proxy]
+  depends_on = [module.keda]
 
   source = "./modules/docuseal"
 
@@ -53,7 +61,7 @@ module "docuseal" {
 }
 
 module "dozzle" {
-  depends_on = [module.reverse_proxy]
+  depends_on = [module.keda]
 
   source = "./modules/dozzle"
 
@@ -62,7 +70,7 @@ module "dozzle" {
 }
 
 module "forgejo" {
-  depends_on = [module.reverse_proxy]
+  depends_on = [module.keda]
 
   source = "./modules/forgejo"
 
@@ -71,7 +79,7 @@ module "forgejo" {
 }
 
 module "headlamp" {
-  depends_on = [module.reverse_proxy]
+  depends_on = [module.keda]
 
   source = "./modules/headlamp"
 
@@ -80,7 +88,7 @@ module "headlamp" {
 }
 
 module "mailpit" {
-  depends_on = [module.reverse_proxy]
+  depends_on = [module.keda]
 
   source = "./modules/mailpit"
 
@@ -89,7 +97,7 @@ module "mailpit" {
 }
 
 module "next-template" {
-  depends_on = [module.reverse_proxy]
+  depends_on = [module.keda]
 
   source = "./modules/next"
 
@@ -98,7 +106,7 @@ module "next-template" {
 }
 
 module "openbao" {
-  depends_on = [module.reverse_proxy]
+  depends_on = [module.keda]
 
   source = "./modules/openbao"
 
@@ -107,7 +115,7 @@ module "openbao" {
 }
 
 module "solid-start-template" {
-  depends_on = [module.reverse_proxy]
+  depends_on = [module.keda]
 
   source = "./modules/solid-start"
 
@@ -116,7 +124,7 @@ module "solid-start-template" {
 }
 
 module "svelte-kit-template" {
-  depends_on = [module.reverse_proxy]
+  depends_on = [module.keda]
 
   source = "./modules/svelte-kit"
 
@@ -125,7 +133,7 @@ module "svelte-kit-template" {
 }
 
 module "todos-example" {
-  depends_on = [module.reverse_proxy]
+  depends_on = [module.keda]
 
   source = "./modules/todos"
 
@@ -134,7 +142,7 @@ module "todos-example" {
 }
 
 module "vaultwarden" {
-  depends_on = [module.reverse_proxy]
+  depends_on = [module.keda]
 
   source = "./modules/vaultwarden"
 
@@ -143,7 +151,7 @@ module "vaultwarden" {
 }
 
 module "vite-spa-template" {
-  depends_on = [module.reverse_proxy]
+  depends_on = [module.keda]
 
   source = "./modules/vite-spa"
 
