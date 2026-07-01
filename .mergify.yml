@@ -3,6 +3,7 @@ shared:
     - check-success = dependency-review
     - check-success = format
     - check-success = gitleaks
+    - check-success = lint
     - check-success = renovate
     - check-success = zizmor
     - or:
