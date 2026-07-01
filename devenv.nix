@@ -9,19 +9,19 @@
 {
   overlays = [
     (final: prev: {
-      opentofu = prev.opentofu.overrideAttrs (oldAttrs: rec {
-        version = "1.12.3";
+      # opentofu = prev.opentofu.overrideAttrs (oldAttrs: rec {
+      #   version = "1.12.3";
 
-        src = final.fetchFromGitHub {
-          owner = "opentofu";
-          repo = "opentofu";
-          rev = "v${version}";
-          hash = "sha256-/Or8+rMsGbZ9aY/oSOqHH0vMFx9Pl0ZRa9KrVJ4X8Ls=";
-        };
+      #   src = final.fetchFromGitHub {
+      #     owner = "opentofu";
+      #     repo = "opentofu";
+      #     rev = "v${version}";
+      #     hash = "sha256-/Or8+rMsGbZ9aY/oSOqHH0vMFx9Pl0ZRa9KrVJ4X8Ls=";
+      #   };
 
-        proxyVendor = true;
-        vendorHash = "sha256-RuRfVoYl0TDcgWlH9udF3X8poQdPJHXeaj9D2k84vao=";
-      });
+      #   proxyVendor = true;
+      #   vendorHash = "sha256-RuRfVoYl0TDcgWlH9udF3X8poQdPJHXeaj9D2k84vao=";
+      # });
 
       tflint = prev.tflint.overrideAttrs (oldAttrs: rec {
         version = "0.63.1";

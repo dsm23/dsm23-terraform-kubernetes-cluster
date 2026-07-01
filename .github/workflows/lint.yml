@@ -45,4 +45,4 @@ jobs:
 
       - name: Yaml lint check
         shell: devenv shell bash -- -e {0}
-        run: tflint .
+        run: yamllint .
