@@ -158,3 +158,12 @@ module "vite-spa-template" {
   gateway_name = local.gateway_name
   namespace    = local.namespace
 }
+
+module "totally-not-xss-vulnerable" {
+  depends_on = [module.keda]
+
+  source = "./modules/xss"
+
+  gateway_name = local.gateway_name
+  namespace    = local.namespace
+}
