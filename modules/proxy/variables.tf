@@ -6,7 +6,7 @@ variable "cert_manager_release_name" {
 
 variable "cert_manager_release_version" {
   type        = string
-  default     = "1.20.2"
+  default     = "1.20.3"
   description = "The version of cert-manager to deploy"
 }
 
@@ -30,7 +30,7 @@ variable "dns_names" {
 
 variable "traefik_release_version" {
   type        = string
-  default     = "40.3.0"
+  default     = "41.0.1"
   description = "The version of Traefik to deploy"
 }
 
@@ -38,10 +38,4 @@ variable "traefik_release_name" {
   type        = string
   default     = "traefik"
   description = "The name of the Traefik Helm release"
-}
-
-variable "traefik_create_namespace" {
-  type        = bool
-  default     = true
-  description = "Whether to create the Traefik namespace if it doesn't exist"
 }

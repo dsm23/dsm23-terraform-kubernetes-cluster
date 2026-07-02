@@ -57,6 +57,7 @@
   # https://devenv.sh/packages/
   packages = with pkgs; [
     git
+    k3d
     trivy
   ];
 
