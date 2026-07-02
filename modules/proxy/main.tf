@@ -7,11 +7,11 @@ locals {
   root_secret_name      = "root-secret"
   websecure_secret_name = "websecure-certificate-tls"
 
-  gateway_version = "v1.6.0-rc.1"
+  gateway_version = "v1.6.0"
 }
 
-data "http" "gateway_api_experimental_install" {
-  url = "https://github.com/kubernetes-sigs/gateway-api/releases/download/${local.gateway_version}/experimental-install.yaml"
+data "http" "gateway_api_install" {
+  url = "https://github.com/kubernetes-sigs/gateway-api/releases/download/${local.gateway_version}/standard-install.yaml"
 }
 
 locals {
@@ -22,7 +22,7 @@ locals {
 }
 
 data "kubectl_file_documents" "gateway_api" {
-  content = data.http.gateway_api_experimental_install.response_body
+  content = data.http.gateway_api_install.response_body
 }
 
 resource "kubectl_manifest" "gateway_api" {

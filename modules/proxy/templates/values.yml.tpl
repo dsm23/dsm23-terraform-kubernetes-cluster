@@ -82,7 +82,6 @@ providers:
     enabled: false
   kubernetesGateway:
     enabled: true
-    experimentalChannel: true
 
 ## Gateway Listeners
 gateway:
@@ -92,12 +91,11 @@ gatewayClass:
   enabled: false
 
 # Enable Observability
-logs:
-  general:
-    level: INFO
+log:
+  level: INFO
   # This enables access logs, outputting them to Traefik's standard output by default. The [Access Logs Documentation](https://doc.traefik.io/traefik/observability/access-logs/) covers formatting, filtering, and output options.
-  access:
-    enabled: true
+accessLog:
+  enabled: true
 
 # Enables Prometheus for Metrics
 metrics:
