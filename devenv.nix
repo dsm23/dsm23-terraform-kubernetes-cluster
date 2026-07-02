@@ -58,6 +58,7 @@
   packages = with pkgs; [
     git
     k3d
+    kubectl
     trivy
   ];
 

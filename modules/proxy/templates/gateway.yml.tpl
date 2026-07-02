@@ -28,7 +28,7 @@ spec:
         certificateRefs:
           - kind: Secret
             name: ${secretName}
-            namespace: ${namespace}
+            namespace: ${certificateNamespace}
       allowedRoutes:
         namespaces:
           from: Same
@@ -61,7 +61,7 @@ spec:
         certificateRefs:
           - kind: Secret
             name: secret-tls
-            namespace: ${namespace}
+            namespace: ${certificateNamespace}
       allowedRoutes:
         kinds:
           - kind: TLSRoute

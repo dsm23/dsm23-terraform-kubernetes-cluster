@@ -1,5 +1,6 @@
 locals {
   gateway_class_name = "traefik"
+  namespace          = "cert-manager"
 
   cluster_issuer_name = "selfsigned-cluster-issuer"
 
@@ -8,6 +9,7 @@ locals {
   websecure_secret_name = "websecure-certificate-tls"
 
   gateway_version = "v1.6.0"
+
 }
 
 data "http" "gateway_api_install" {
@@ -45,21 +47,23 @@ resource "kubectl_manifest" "gateway" {
   depends_on = [kubectl_manifest.gateway_api]
 
   yaml_body = templatefile("${path.module}/templates/gateway.yml.tpl", {
-    gatewayClassName = local.gateway_class_name
-    gatewayName      = var.gateway_name
-    namespace        = var.namespace,
-    secretName       = local.websecure_secret_name
+    gatewayClassName     = local.gateway_class_name
+    gatewayName          = var.gateway_name
+    namespace            = var.namespace,
+    certificateNamespace = local.namespace
+    secretName           = local.websecure_secret_name
   })
 }
 
 resource "helm_release" "cert_manager" {
   depends_on = [kubectl_manifest.gateway_api]
 
-  name       = var.cert_manager_release_name
-  repository = "https://charts.jetstack.io"
-  chart      = "cert-manager"
-  version    = var.cert_manager_release_version
-  namespace  = var.namespace
+  name             = var.cert_manager_release_name
+  namespace        = local.namespace
+  repository       = "https://charts.jetstack.io"
+  chart            = "cert-manager"
+  version          = var.cert_manager_release_version
+  create_namespace = true
 
   values = [
     yamlencode({
@@ -88,7 +92,7 @@ resource "kubectl_manifest" "ca" {
 
   yaml_body = templatefile("${path.module}/templates/ca.yml.tpl", {
     name              = "my-selfsigned-ca"
-    namespace         = var.namespace
+    namespace         = local.namespace
     commonName        = "selfsigned-ca"
     secretName        = local.root_secret_name
     clusterIssuerName = local.cluster_issuer_name
@@ -100,7 +104,7 @@ resource "kubectl_manifest" "issuer" {
 
   yaml_body = templatefile("${path.module}/templates/issuer.yml.tpl", {
     name       = local.issuer_name
-    namespace  = var.namespace
+    namespace  = local.namespace
     secretName = local.root_secret_name
   })
 }
@@ -110,7 +114,7 @@ resource "kubectl_manifest" "webscure_certificate" {
 
   yaml_body = templatefile("${path.module}/templates/certificate.yml.tpl", {
     name       = "websecure-certificate"
-    namespace  = var.namespace
+    namespace  = local.namespace
     secretName = local.websecure_secret_name
     dnsNames   = var.dns_names
     issuerName = local.issuer_name
@@ -122,10 +126,38 @@ resource "kubectl_manifest" "tls_certificate" {
 
   yaml_body = templatefile("${path.module}/templates/certificate.yml.tpl", {
     name       = "secret-tls"
-    namespace  = var.namespace
+    namespace  = local.namespace
     secretName = "secret-tls"
     dnsNames   = var.dns_names
     issuerName = local.issuer_name
+  })
+}
+
+resource "kubectl_manifest" "allow_gateway_to_cert_manager_secrets" {
+  depends_on = [helm_release.cert_manager]
+
+  yaml_body = yamlencode({
+    apiVersion = "gateway.networking.k8s.io/v1"
+    kind       = "ReferenceGrant"
+    metadata = {
+      name      = "allow-production-gateway-to-secrets"
+      namespace = local.namespace # Must be the cert-manager namespace where the secrets live
+    }
+    spec = {
+      from = [
+        {
+          group     = "gateway.networking.k8s.io"
+          kind      = "Gateway"
+          namespace = var.namespace
+        }
+      ]
+      to = [
+        {
+          group = ""
+          kind  = "Secret"
+        }
+      ]
+    }
   })
 }
 
