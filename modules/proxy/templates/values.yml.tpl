@@ -17,14 +17,9 @@ ports:
   websecure:
     port: 443
     nodePort: 30001
-    # http3: {}
+    http3:
+      enabled: true
     protocol: TCP
-    # address: "[::]:443"
-
-  # websecure-udp:
-  #   port: 443
-  #   nodePort: 30001
-  #   protocol: UDP
 
   tls-passthrough:
     port: 3443
