@@ -11,8 +11,9 @@ resource "helm_release" "headlamp" {
 
   values = [
     templatefile("${path.module}/templates/values.yml.tpl", {
-      gatewayName = var.gateway_name
-      hostnames   = var.hostnames
+      gatewayName      = var.gateway_name
+      gatewayNamespace = var.gateway_namespace
+      hostnames        = var.hostnames
     })
   ]
 }

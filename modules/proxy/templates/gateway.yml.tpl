@@ -1,4 +1,3 @@
----
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
@@ -14,11 +13,11 @@ spec:
         namespaces:
           from: Same
       http:
-      redirections:
-        entryPoint:
-          to: websecure
-          scheme: https
-          permanent: true
+        redirections:
+          entryPoint:
+            to: websecure
+            scheme: https
+            permanent: true
 
     - name: websecure
       protocol: HTTPS
@@ -31,7 +30,10 @@ spec:
             namespace: ${certificateNamespace}
       allowedRoutes:
         namespaces:
-          from: Same
+          from: Selector
+          selector:
+            matchLabels:
+              gateway-access: "true"
 
     - name: smtp
       protocol: TCP
@@ -51,7 +53,10 @@ spec:
         kinds:
           - kind: TLSRoute
         namespaces:
-          from: Same
+          from: Selector
+          selector:
+            matchLabels:
+              gateway-access: "true"
 
     - name: tls
       protocol: TLS
@@ -66,4 +71,7 @@ spec:
         kinds:
           - kind: TLSRoute
         namespaces:
-          from: Same
+          from: Selector
+          selector:
+            matchLabels:
+              gateway-access: "true"

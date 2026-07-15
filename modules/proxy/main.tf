@@ -27,6 +27,15 @@ data "kubectl_file_documents" "gateway_api" {
   content = data.http.gateway_api_install.response_body
 }
 
+resource "kubernetes_namespace_v1" "proxy" {
+  metadata {
+    name = var.namespace
+    labels = {
+      gateway-access = "true"
+    }
+  }
+}
+
 resource "kubectl_manifest" "gateway_api" {
   for_each  = local.manifests
   yaml_body = each.value
@@ -39,7 +48,7 @@ resource "kubectl_manifest" "gateway_class" {
 
   yaml_body = templatefile("${path.module}/templates/gatewayClass.yml.tpl", {
     gatewayClassName = local.gateway_class_name
-    namespace        = var.namespace
+    namespace        = kubernetes_namespace_v1.proxy.metadata[0].name
   })
 }
 
@@ -49,7 +58,7 @@ resource "kubectl_manifest" "gateway" {
   yaml_body = templatefile("${path.module}/templates/gateway.yml.tpl", {
     gatewayClassName     = local.gateway_class_name
     gatewayName          = var.gateway_name
-    namespace            = var.namespace,
+    namespace            = kubernetes_namespace_v1.proxy.metadata[0].name
     certificateNamespace = local.namespace
     secretName           = local.websecure_secret_name
   })
@@ -148,7 +157,7 @@ resource "kubectl_manifest" "allow_gateway_to_cert_manager_secrets" {
         {
           group     = "gateway.networking.k8s.io"
           kind      = "Gateway"
-          namespace = var.namespace
+          namespace = kubernetes_namespace_v1.proxy.metadata[0].name
         }
       ]
       to = [
@@ -166,11 +175,11 @@ resource "helm_release" "traefik" {
   repository = "https://traefik.github.io/charts"
   chart      = "traefik"
   version    = var.traefik_release_version
-  namespace  = var.namespace
+  namespace  = kubernetes_namespace_v1.proxy.metadata[0].name
 
   values = [
     templatefile("${path.module}/templates/values.yml.tpl", {
-      namespace = var.namespace,
+      namespace = kubernetes_namespace_v1.proxy.metadata[0].name,
     })
   ]
 }
@@ -179,6 +188,6 @@ resource "kubectl_manifest" "middleware" {
   depends_on = [helm_release.traefik]
 
   yaml_body = templatefile("${path.module}/templates/middleware.yml.tpl", {
-    namespace = var.namespace
+    namespace = kubernetes_namespace_v1.proxy.metadata[0].name
   })
 }

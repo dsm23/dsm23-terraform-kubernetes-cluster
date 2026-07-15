@@ -200,6 +200,7 @@ resource "kubectl_manifest" "dozzle_route" {
     spec = {
       parentRefs = [{
         name        = var.gateway_name
+        namespace   = "traefik"
         sectionName = "websecure"
       }]
       hostnames = var.hostnames

@@ -105,6 +105,7 @@ resource "kubectl_manifest" "browserless_route" {
     spec = {
       parentRefs = [{
         name        = var.gateway_name
+        namespace   = "traefik"
         sectionName = "websecure"
       }]
       hostnames = var.hostnames
