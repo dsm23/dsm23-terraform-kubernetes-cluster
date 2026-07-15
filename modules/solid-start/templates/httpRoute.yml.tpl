@@ -6,6 +6,7 @@ metadata:
 spec:
   parentRefs:
     - name: ${gatewayName}
+      namespace: traefik
       sectionName: websecure
   hostnames: ${jsonencode(hostnames)}
   rules:

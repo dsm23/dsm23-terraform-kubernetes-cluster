@@ -139,6 +139,7 @@ resource "kubectl_manifest" "mailpit_route" {
     spec = {
       parentRefs = [{
         name        = var.gateway_name
+        namespace   = "traefik"
         sectionName = "websecure"
       }]
       hostnames = var.hostnames

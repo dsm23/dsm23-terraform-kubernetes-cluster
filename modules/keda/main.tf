@@ -26,7 +26,7 @@ resource "kubectl_manifest" "reference_grant" {
   depends_on = [helm_release.keda_core]
 
   yaml_body = yamlencode({
-    apiVersion = "gateway.networking.k8s.io/v1beta1"
+    apiVersion = "gateway.networking.k8s.io/v1"
     kind       = "ReferenceGrant"
     metadata = {
       name      = "allow-httproute-to-interceptor"
@@ -38,6 +38,12 @@ resource "kubectl_manifest" "reference_grant" {
           group     = "gateway.networking.k8s.io"
           kind      = "HTTPRoute"
           namespace = var.namespace
+        },
+        {
+          group = "gateway.networking.k8s.io"
+          kind  = "HTTPRoute"
+          # TODO: remove hard-coding
+          namespace = "apps"
         }
       ]
       to = [

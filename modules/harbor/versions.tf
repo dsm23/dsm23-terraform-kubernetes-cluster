@@ -7,11 +7,6 @@ terraform {
       version = "3.1.1"
     }
 
-    kubectl = {
-      source  = "gavinbunney/kubectl"
-      version = "1.19.0"
-    }
-
     kubernetes = {
       source  = "hashicorp/kubernetes"
       version = "3.1.0"

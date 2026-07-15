@@ -5,12 +5,21 @@ locals {
   host_port      = 8200
 }
 
+resource "kubernetes_namespace_v1" "openbao" {
+  metadata {
+    name = "openbao"
+    labels = {
+      gateway-access = "true"
+    }
+  }
+}
+
 resource "helm_release" "openbao" {
   name       = local.name
   repository = "https://openbao.github.io/openbao-helm"
   chart      = "openbao"
   version    = var.release_version
-  namespace  = var.namespace
+  namespace  = kubernetes_namespace_v1.openbao.metadata[0].name
 
   values = [
     templatefile("${path.module}/templates/values.yml.tpl", {
@@ -27,18 +36,19 @@ resource "kubectl_manifest" "openbao_route" {
     kind       = "TLSRoute"
     metadata = {
       name      = "${local.name}-route"
-      namespace = var.namespace
+      namespace = kubernetes_namespace_v1.openbao.metadata[0].name
     }
     spec = {
       parentRefs = [{
         name        = var.gateway_name
+        namespace   = "traefik"
         sectionName = "tls-passthrough"
       }]
       hostnames = var.hostnames
       rules = [{
         backendRefs = [{
           name      = "openbao-active"
-          namespace = var.namespace
+          namespace = kubernetes_namespace_v1.openbao.metadata[0].name
           port      = local.host_port
         }]
       }]

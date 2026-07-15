@@ -3,4 +3,5 @@ httpRoute:
   hostnames: ${jsonencode(hostnames)}
   parentRefs:
     - name: ${gatewayName}
+      namespace: ${gatewayNamespace}
       sectionName: websecure

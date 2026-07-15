@@ -1,7 +1,7 @@
 variable "release_version" {
   type        = string
-  default     = "0.42.0"
-  description = "The version of Headlamp to deploy."
+  default     = "1.19.1"
+  description = "The version of Harbor to deploy."
 }
 
 variable "gateway_name" {
@@ -16,11 +16,12 @@ variable "gateway_namespace" {
 
 variable "namespace" {
   type        = string
+  default     = "traefik"
   description = "The namespace where next should be deployed."
 }
 
 variable "hostnames" {
   type        = list(string)
-  default     = ["headlamp.docker.localhost"]
+  default     = ["harbor.docker.localhost"]
   description = "The hostnames supplied to Kubernetes Gateway"
 }
