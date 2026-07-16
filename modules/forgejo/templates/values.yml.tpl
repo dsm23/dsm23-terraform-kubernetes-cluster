@@ -2,6 +2,6 @@ httpRoute:
   enabled: true
   hostnames: ${jsonencode(hostnames)}
   parentRefs:
-    - name: ${gatewayName}
-      namespace: ${gatewayNamespace}
+    - name: ${name}
+      namespace: ${namespace}
       sectionName: websecure

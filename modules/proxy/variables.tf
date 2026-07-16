@@ -10,23 +10,11 @@ variable "cert_manager_release_version" {
   description = "The version of cert-manager to deploy"
 }
 
-variable "gateway_name" {
-  type        = string
-  description = "The gateway name in the reverse proxy"
-}
-
-variable "namespace" {
-  type        = string
-  default     = "traefik"
-  description = "The namespace where Traefik should be deployed"
-}
-
 variable "dns_names" {
   type        = list(string)
   default     = ["*.docker.localhost"]
   description = "The hostnames supplied to Kubernetes Gateway"
 }
-
 
 variable "traefik_release_version" {
   type        = string

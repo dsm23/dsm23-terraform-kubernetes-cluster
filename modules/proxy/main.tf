@@ -10,6 +10,7 @@ locals {
 
   gateway_version = "v1.6.0"
 
+  context = data.context_config.config
 }
 
 data "http" "gateway_api_install" {
@@ -29,7 +30,7 @@ data "kubectl_file_documents" "gateway_api" {
 
 resource "kubernetes_namespace_v1" "proxy" {
   metadata {
-    name = var.namespace
+    name = local.context.values.gateway_namespace
     labels = {
       gateway-access = "true"
     }
@@ -57,7 +58,7 @@ resource "kubectl_manifest" "gateway" {
 
   yaml_body = templatefile("${path.module}/templates/gateway.yml.tpl", {
     gatewayClassName     = local.gateway_class_name
-    gatewayName          = var.gateway_name
+    gatewayName          = local.context.values.gateway_name
     namespace            = kubernetes_namespace_v1.proxy.metadata[0].name
     certificateNamespace = local.namespace
     secretName           = local.websecure_secret_name

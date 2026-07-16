@@ -1,5 +1,7 @@
 locals {
   namespace = "keda"
+
+  context = data.context_config.config
 }
 
 resource "helm_release" "keda_core" {
@@ -37,13 +39,12 @@ resource "kubectl_manifest" "reference_grant" {
         {
           group     = "gateway.networking.k8s.io"
           kind      = "HTTPRoute"
-          namespace = var.namespace
+          namespace = local.context.values.gateway_namespace
         },
         {
-          group = "gateway.networking.k8s.io"
-          kind  = "HTTPRoute"
-          # TODO: remove hard-coding
-          namespace = "apps"
+          group     = "gateway.networking.k8s.io"
+          kind      = "HTTPRoute"
+          namespace = local.context.values.apps_namespace
         }
       ]
       to = [

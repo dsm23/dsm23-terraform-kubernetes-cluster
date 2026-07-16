@@ -6,6 +6,8 @@ locals {
 
   smtp_container_port = 1025
   smtp_host_port      = 1025
+
+  context = data.context_config.config
 }
 
 resource "docker_image" "mailpit_image" {
@@ -138,8 +140,8 @@ resource "kubectl_manifest" "mailpit_route" {
     }
     spec = {
       parentRefs = [{
-        name        = var.gateway_name
-        namespace   = "traefik"
+        name        = local.context.values.gateway_name
+        namespace   = local.context.values.gateway_namespace
         sectionName = "websecure"
       }]
       hostnames = var.hostnames
@@ -189,7 +191,8 @@ resource "kubectl_manifest" "mailpit_smtp_route" {
     }
     spec = {
       parentRefs = [{
-        name        = var.gateway_name
+        name        = local.context.values.gateway_name
+        namespace   = local.context.values.gateway_namespace
         sectionName = "smtp"
       }]
       rules = [{

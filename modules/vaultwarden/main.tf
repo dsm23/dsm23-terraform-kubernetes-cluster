@@ -3,6 +3,8 @@ locals {
 
   container_port = 80
   host_port      = 80
+
+  context = data.context_config.config
 }
 
 resource "docker_image" "vaultwarden_image" {
@@ -109,8 +111,8 @@ resource "kubectl_manifest" "vaultwarden_route" {
     }
     spec = {
       parentRefs = [{
-        name        = var.gateway_name
-        namespace   = "traefik"
+        name        = local.context.values.gateway_name
+        namespace   = local.context.values.gateway_namespace
         sectionName = "websecure"
       }]
       hostnames = var.hostnames

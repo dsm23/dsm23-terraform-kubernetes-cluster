@@ -3,6 +3,8 @@ locals {
 
   container_port = 8200
   host_port      = 8200
+
+  context = data.context_config.config
 }
 
 resource "kubernetes_namespace_v1" "openbao" {
@@ -40,8 +42,8 @@ resource "kubectl_manifest" "openbao_route" {
     }
     spec = {
       parentRefs = [{
-        name        = var.gateway_name
-        namespace   = "traefik"
+        name        = local.context.values.gateway_name
+        namespace   = local.context.values.gateway_namespace
         sectionName = "tls-passthrough"
       }]
       hostnames = var.hostnames
