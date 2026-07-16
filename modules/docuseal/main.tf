@@ -1,8 +1,11 @@
 locals {
-  name = "docuseal"
+  name      = "docuseal"
+  namespace = "docuseal"
 
   container_port = 3000
   host_port      = 80
+
+  context = data.context_config.config
 }
 
 resource "docker_image" "docuseal_image" {
@@ -10,13 +13,21 @@ resource "docker_image" "docuseal_image" {
   pull_triggers = [data.docker_registry_image.docuseal_image.sha256_digest]
 
   keep_locally = true
+}
 
+resource "kubernetes_namespace_v1" "docuseal" {
+  metadata {
+    name = local.namespace
+    labels = {
+      gateway-access = "true"
+    }
+  }
 }
 
 resource "kubernetes_persistent_volume_claim_v1" "docuseal_pvc" {
   metadata {
     name      = "${local.name}-pvc"
-    namespace = var.namespace
+    namespace = local.namespace
   }
 
   # k3d only
@@ -36,7 +47,7 @@ resource "kubernetes_persistent_volume_claim_v1" "docuseal_pvc" {
 resource "kubernetes_deployment_v1" "docuseal" {
   metadata {
     name      = local.name
-    namespace = var.namespace
+    namespace = local.namespace
   }
 
   spec {
@@ -115,7 +126,7 @@ resource "kubernetes_deployment_v1" "docuseal" {
 resource "kubernetes_service_v1" "docuseal_service" {
   metadata {
     name      = "${local.name}-service"
-    namespace = var.namespace
+    namespace = local.namespace
   }
   spec {
     type = "ClusterIP"
@@ -136,12 +147,12 @@ resource "kubectl_manifest" "docuseal_route" {
     kind       = "HTTPRoute"
     metadata = {
       name      = "${local.name}-route"
-      namespace = var.namespace
+      namespace = local.namespace
     }
     spec = {
       parentRefs = [{
-        name        = var.gateway_name
-        namespace   = "traefik"
+        name        = local.context.values.gateway_name
+        namespace   = local.context.values.gateway_namespace
         sectionName = "websecure"
       }]
       hostnames = var.hostnames

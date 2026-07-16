@@ -1,6 +1,41 @@
 # This file is maintained automatically by "tofu init".
 # Manual edits may be lost in future updates.
 
+provider "registry.opentofu.org/cloudposse/context" {
+  version     = "0.5.0"
+  constraints = "0.5.0"
+  hashes = [
+    "h1:1zKqqLn7ODWJjcKCfZIkRBfFBmXx420QqZXJa+B+e4U=",
+    "h1:5YMyk6dmjKtePtZSGj+oR7ez3Pmv23MxlQsbIiHJRTE=",
+    "h1:FrBtk7PbzOJrf6DbNtC/FNnHhHioO+/L78mB5hCuaKU=",
+    "h1:NJynA+zgpdewSLrg1Xhi5iI+cXwEbSDziAREQPzolws=",
+    "h1:SYwXf1UhzsIPUR1tphLSFhqih8nm48aX1VY+lnt1u0M=",
+    "h1:VqyN1wirhW6y2i1Yih/WM5OrC3kilgLP6fgTPdwkqDU=",
+    "h1:W1efRmKxh3GSFtA+bRk7tQ0l8oyeShRoD58L1QD2NtM=",
+    "h1:g1Yq54Ya5poWu9l/3095ET1pA1AHs6SMI1rGDYIh/Sk=",
+    "h1:ggkO7qQC0vSQvmkCoLpARnP2/QScMArNBnFlgzmq3rM=",
+    "h1:nU6hnx8fCvKLzCttD7HPq8ycfSrB3tBnz2EfVIJOma4=",
+    "h1:pXM6NIRftfsAKUTWyqMJf5ohowr0uTuK9ufSBFz22pE=",
+    "h1:sSpd2O+N+2QkBA9UpRinsLzfF/KqXb08dTozwmpOJvg=",
+    "h1:vLA6dbc66TB3sGpcD6yH2d3Y7MK2ZpYTDUtc+ijU0Ts=",
+    "h1:xaVmBhC9wRpZAM1uJ8X+49Gvrapqc0K5p82wiy0mI3w=",
+    "zh:087137af4229ff85de93e42f4883ca34b13eb2ce7c30dfecc0f8938f5fb0628f",
+    "zh:1c6f19b13881d8746e910c0ec11db99253406db6df6e43fe18e99c48f03d1859",
+    "zh:2acbb759d2ae9ee65010434cc7f5a8be994f109439093884b13b7e80796b8b2d",
+    "zh:3b670a1818ca46bb90142ae97889f173029b9dbec947ffe1964110c3cbbf7ba6",
+    "zh:3eda5e2c8b11d8af8dd66681b7e5325daf30fc599e75aa900564e648e63762d4",
+    "zh:5a0a1755991af3a92a576dfb24ddcb9318dbd820caebcba911b2cdb8b07e6a08",
+    "zh:79ce5579e06614a998316f882eb4c6d013f3910324c2ed42dc346e1f1af71057",
+    "zh:ab4a8da7e54f5302e622421abcc1611a6a920b61e40ef5bf3cdb753ddbb3ee54",
+    "zh:af71af11c8d82c1194b500f41e750341a14e9237d7a71e8632906a53d5febcac",
+    "zh:bcfbf48356f8fdeeb01a400e03a5fd5dcf0dd8e194509e100217b11046026482",
+    "zh:c8e1e1eec781027c03acb83ca31d2d84c419325fc9301a79e81983d071648d63",
+    "zh:cc60031a5b7cfb40c48fe11eaafc027cac98a4a6d3783e5feb2e8f748e3a344f",
+    "zh:f30f3be7005f070c408d5062e79b99816df370d8f8636a20bd1af88f3b5c18db",
+    "zh:f5269f928966f591adab5c610653ed76f596573242cd2aa9a72bd39f90066d46",
+  ]
+}
+
 provider "registry.opentofu.org/gavinbunney/kubectl" {
   version     = "1.19.0"
   constraints = "1.19.0"

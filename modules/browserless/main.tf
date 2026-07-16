@@ -1,8 +1,11 @@
 locals {
-  name = "browserless"
+  name      = "browserless"
+  namespace = "browserless"
 
   container_port = 3000
   host_port      = 80
+
+  context = data.context_config.config
 }
 
 resource "docker_image" "browserless_image" {
@@ -12,10 +15,19 @@ resource "docker_image" "browserless_image" {
   keep_locally = true
 }
 
+resource "kubernetes_namespace_v1" "browserless" {
+  metadata {
+    name = local.namespace
+    labels = {
+      gateway-access = "true"
+    }
+  }
+}
+
 resource "kubernetes_deployment_v1" "browserless_deployment" {
   metadata {
     name      = local.name
-    namespace = var.namespace
+    namespace = local.namespace
   }
 
   spec {
@@ -79,7 +91,7 @@ resource "kubernetes_deployment_v1" "browserless_deployment" {
 resource "kubernetes_service_v1" "browserless_service" {
   metadata {
     name      = "${local.name}-service"
-    namespace = var.namespace
+    namespace = local.namespace
   }
   spec {
     type = "ClusterIP"
@@ -100,12 +112,12 @@ resource "kubectl_manifest" "browserless_route" {
     kind       = "HTTPRoute"
     metadata = {
       name      = "${local.name}-route"
-      namespace = var.namespace
+      namespace = local.namespace
     }
     spec = {
       parentRefs = [{
-        name        = var.gateway_name
-        namespace   = "traefik"
+        name        = local.context.values.gateway_name
+        namespace   = local.context.values.gateway_namespace
         sectionName = "websecure"
       }]
       hostnames = var.hostnames

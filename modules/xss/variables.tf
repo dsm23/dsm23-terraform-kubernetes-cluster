@@ -4,11 +4,6 @@ variable "release_version" {
   description = "The version of totally-not-xss-vulnerable to deploy."
 }
 
-variable "gateway_name" {
-  type        = string
-  description = "The gateway name in the reverse proxy."
-}
-
 variable "namespace" {
   type        = string
   description = "The namespace where totally-not-xss-vulnerable should be deployed."

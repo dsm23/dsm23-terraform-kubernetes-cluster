@@ -1,3 +1,17 @@
+provider "context" {
+  properties = {
+    apps_namespace    = {}
+    gateway_name      = {}
+    gateway_namespace = {}
+  }
+
+  values = {
+    apps_namespace    = "apps"
+    gateway_name      = "traefik-gateway"
+    gateway_namespace = "traefik"
+  }
+}
+
 provider "docker" {
   host = var.docker_host
 }

@@ -1,6 +1,8 @@
 locals {
   name      = "harbor"
   namespace = "harbor"
+
+  context = data.context_config.config
 }
 
 resource "kubernetes_namespace_v1" "harbor" {
@@ -17,13 +19,13 @@ resource "helm_release" "harbor" {
   repository = "https://helm.goharbor.io"
   chart      = "harbor"
   version    = var.release_version
-  namespace  = kubernetes_namespace_v1.harbor.metadata[0].name
+  namespace  = local.namespace
 
   values = [
     templatefile("${path.module}/templates/values.yml.tpl", {
-      gatewayName      = var.gateway_name
-      gatewayNamespace = var.gateway_namespace
-      hostnames        = var.hostnames
+      name      = local.context.values.gateway_name
+      namespace = local.context.values.gateway_namespace
+      hostnames = var.hostnames
     })
   ]
 }

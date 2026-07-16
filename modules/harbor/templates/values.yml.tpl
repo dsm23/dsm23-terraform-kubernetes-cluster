@@ -5,8 +5,8 @@ expose:
   route:
     hosts: ${jsonencode(hostnames)}
     parentRefs:
-      - name: ${gatewayName}
-        namespace: ${gatewayNamespace}
+      - name: ${name}
+        namespace: ${namespace}
         sectionName: websecure
 
 # harborAdminPassword: password

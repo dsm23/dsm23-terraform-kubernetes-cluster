@@ -4,6 +4,8 @@ locals {
   container_port = 3000
   host_port      = 80
 
+  context = data.context_config.config
+
   deployment_name        = local.name
   service_name           = local.name
   interceptor_route_name = "${local.name}-interceptor-route"
@@ -98,10 +100,11 @@ resource "kubernetes_service_v1" "svelte_kit_service" {
 }
 resource "kubectl_manifest" "svelte_kit_route" {
   yaml_body = templatefile("${path.module}/templates/httpRoute.yml.tpl", {
-    name        = "${local.name}-route"
-    namespace   = var.namespace
-    gatewayName = var.gateway_name
-    hostnames   = var.hostnames
+    name             = "${local.name}-route"
+    namespace        = var.namespace
+    gatewayName      = local.context.values.gateway_name
+    gatewayNamespace = local.context.values.gateway_namespace
+    hostnames        = var.hostnames
   })
 }
 

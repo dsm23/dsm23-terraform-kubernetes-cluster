@@ -16,11 +16,6 @@ resource "k3d_cluster" "k3d" {
   { cluster_image = docker_image.k3s_image.name })
 }
 
-locals {
-  gateway_name = "traefik-gateway"
-  namespace    = "traefik"
-}
-
 resource "kubernetes_namespace_v1" "apps" {
   metadata {
     name = "apps"
@@ -32,73 +27,48 @@ resource "kubernetes_namespace_v1" "apps" {
 
 module "reverse_proxy" {
   source = "./modules/proxy"
-
-  gateway_name = local.gateway_name
-  namespace    = local.namespace
 }
 
 module "keda" {
   depends_on = [module.reverse_proxy]
 
-  source    = "./modules/keda"
-  namespace = local.namespace
+  source = "./modules/keda"
 }
 
 module "browserless" {
   depends_on = [module.keda]
 
   source = "./modules/browserless"
-
-  gateway_name = local.gateway_name
-  namespace    = kubernetes_namespace_v1.apps.metadata[0].name
 }
 
 module "docuseal" {
   depends_on = [module.keda]
 
   source = "./modules/docuseal"
-
-  gateway_name = local.gateway_name
-  namespace    = kubernetes_namespace_v1.apps.metadata[0].name
 }
 
 module "dozzle" {
   depends_on = [module.keda]
 
   source = "./modules/dozzle"
-
-  gateway_name = local.gateway_name
-  namespace    = kubernetes_namespace_v1.apps.metadata[0].name
 }
 
 module "forgejo" {
   depends_on = [module.keda]
 
   source = "./modules/forgejo"
-
-  gateway_name      = local.gateway_name
-  gateway_namespace = local.namespace
-  namespace         = kubernetes_namespace_v1.apps.metadata[0].name
 }
 
 module "harbor" {
   depends_on = [module.keda]
 
   source = "./modules/harbor"
-
-  gateway_name      = local.gateway_name
-  gateway_namespace = local.namespace
-  namespace         = kubernetes_namespace_v1.apps.metadata[0].name
 }
 
 module "headlamp" {
   depends_on = [module.keda]
 
   source = "./modules/headlamp"
-
-  gateway_name      = local.gateway_name
-  gateway_namespace = local.namespace
-  namespace         = kubernetes_namespace_v1.apps.metadata[0].name
 }
 
 module "mailpit" {
@@ -106,8 +76,7 @@ module "mailpit" {
 
   source = "./modules/mailpit"
 
-  gateway_name = local.gateway_name
-  namespace    = kubernetes_namespace_v1.apps.metadata[0].name
+  namespace = kubernetes_namespace_v1.apps.metadata[0].name
 }
 
 module "next-template" {
@@ -115,17 +84,13 @@ module "next-template" {
 
   source = "./modules/next"
 
-  gateway_name = local.gateway_name
-  namespace    = kubernetes_namespace_v1.apps.metadata[0].name
+  namespace = kubernetes_namespace_v1.apps.metadata[0].name
 }
 
 module "openbao" {
   depends_on = [module.keda]
 
   source = "./modules/openbao"
-
-  gateway_name = local.gateway_name
-  namespace    = kubernetes_namespace_v1.apps.metadata[0].name
 }
 
 module "solid-start-template" {
@@ -133,8 +98,7 @@ module "solid-start-template" {
 
   source = "./modules/solid-start"
 
-  gateway_name = local.gateway_name
-  namespace    = kubernetes_namespace_v1.apps.metadata[0].name
+  namespace = kubernetes_namespace_v1.apps.metadata[0].name
 }
 
 module "svelte-kit-template" {
@@ -142,8 +106,7 @@ module "svelte-kit-template" {
 
   source = "./modules/svelte-kit"
 
-  gateway_name = local.gateway_name
-  namespace    = kubernetes_namespace_v1.apps.metadata[0].name
+  namespace = kubernetes_namespace_v1.apps.metadata[0].name
 }
 
 module "todos-example" {
@@ -151,8 +114,7 @@ module "todos-example" {
 
   source = "./modules/todos"
 
-  gateway_name = local.gateway_name
-  namespace    = kubernetes_namespace_v1.apps.metadata[0].name
+  namespace = kubernetes_namespace_v1.apps.metadata[0].name
 }
 
 module "vaultwarden" {
@@ -160,8 +122,7 @@ module "vaultwarden" {
 
   source = "./modules/vaultwarden"
 
-  gateway_name = local.gateway_name
-  namespace    = kubernetes_namespace_v1.apps.metadata[0].name
+  namespace = kubernetes_namespace_v1.apps.metadata[0].name
 }
 
 module "vite-spa-template" {
@@ -169,8 +130,7 @@ module "vite-spa-template" {
 
   source = "./modules/vite-spa"
 
-  gateway_name = local.gateway_name
-  namespace    = kubernetes_namespace_v1.apps.metadata[0].name
+  namespace = kubernetes_namespace_v1.apps.metadata[0].name
 }
 
 module "totally-not-xss-vulnerable" {
@@ -178,6 +138,5 @@ module "totally-not-xss-vulnerable" {
 
   source = "./modules/xss"
 
-  gateway_name = local.gateway_name
-  namespace    = kubernetes_namespace_v1.apps.metadata[0].name
+  namespace = kubernetes_namespace_v1.apps.metadata[0].name
 }

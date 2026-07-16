@@ -1,8 +1,11 @@
 locals {
-  name = "dozzle"
+  name      = "dozzle"
+  namespace = "dozzle"
 
   container_port = 8080
   host_port      = 8080
+
+  context = data.context_config.config
 
   rbac_name = "pod-viewer"
   role_name = "pod-viewer-role"
@@ -15,10 +18,19 @@ resource "docker_image" "dozzle_image" {
   keep_locally = true
 }
 
+resource "kubernetes_namespace_v1" "dozzle" {
+  metadata {
+    name = local.namespace
+    labels = {
+      gateway-access = "true"
+    }
+  }
+}
+
 resource "kubernetes_service_account_v1" "rbac" {
   metadata {
     name      = local.rbac_name
-    namespace = var.namespace
+    namespace = local.namespace
   }
 }
 
@@ -54,14 +66,14 @@ resource "kubernetes_cluster_role_binding_v1" "pod_viewer_binding" {
   subject {
     kind      = "ServiceAccount"
     name      = local.rbac_name
-    namespace = var.namespace
+    namespace = local.namespace
   }
 }
 
 resource "kubernetes_persistent_volume_claim_v1" "dozzle_data" {
   metadata {
     name      = "dozzle-data"
-    namespace = var.namespace
+    namespace = local.namespace
   }
 
   # k3d only
@@ -86,7 +98,7 @@ resource "kubernetes_persistent_volume_claim_v1" "dozzle_data" {
 resource "kubernetes_deployment_v1" "dozzle_deployment" {
   metadata {
     name      = local.name
-    namespace = var.namespace
+    namespace = local.namespace
   }
 
   spec {
@@ -173,7 +185,7 @@ resource "kubernetes_deployment_v1" "dozzle_deployment" {
 resource "kubernetes_service_v1" "dozzle_service" {
   metadata {
     name      = "${local.name}-service"
-    namespace = var.namespace
+    namespace = local.namespace
   }
   spec {
     type = "ClusterIP"
@@ -195,12 +207,12 @@ resource "kubectl_manifest" "dozzle_route" {
     kind       = "HTTPRoute"
     metadata = {
       name      = "${local.name}-route"
-      namespace = var.namespace
+      namespace = local.namespace
     }
     spec = {
       parentRefs = [{
-        name        = var.gateway_name
-        namespace   = "traefik"
+        name        = local.context.values.gateway_name
+        namespace   = local.context.values.gateway_namespace
         sectionName = "websecure"
       }]
       hostnames = var.hostnames
