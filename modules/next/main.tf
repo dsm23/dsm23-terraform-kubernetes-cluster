@@ -34,7 +34,8 @@ resource "kubernetes_deployment_v1" "next_template_deployment" {
     template {
       metadata {
         labels = {
-          app = local.name
+          app         = local.name
+          environment = "production"
         }
       }
 

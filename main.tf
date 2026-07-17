@@ -71,6 +71,12 @@ module "headlamp" {
   source = "./modules/headlamp"
 }
 
+module "kyverno" {
+  depends_on = [module.keda]
+
+  source = "./modules/kyverno"
+}
+
 module "mailpit" {
   depends_on = [module.keda]
 

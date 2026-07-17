@@ -1,0 +1,25 @@
+terraform {
+  required_version = ">= 1.12.3"
+
+  required_providers {
+    context = {
+      source  = "cloudposse/context"
+      version = "0.5.0"
+    }
+
+    helm = {
+      source  = "hashicorp/helm"
+      version = "3.1.1"
+    }
+
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = "1.19.0"
+    }
+
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "3.1.0"
+    }
+  }
+}

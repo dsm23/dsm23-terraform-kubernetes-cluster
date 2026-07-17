@@ -34,7 +34,8 @@ resource "kubernetes_deployment_v1" "svelte_kit" {
     template {
       metadata {
         labels = {
-          app = local.name
+          app         = local.name
+          environment = "production"
         }
       }
 

@@ -34,7 +34,8 @@ resource "kubernetes_deployment_v1" "mailpit" {
     template {
       metadata {
         labels = {
-          app = local.name
+          app         = local.name
+          environment = "production"
         }
       }
 
