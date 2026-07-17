@@ -31,7 +31,8 @@ resource "kubernetes_deployment_v1" "vaultwarden_deployment" {
     template {
       metadata {
         labels = {
-          app = local.name
+          app         = local.name
+          environment = "production"
         }
       }
 
