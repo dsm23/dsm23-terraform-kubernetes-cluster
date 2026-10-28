@@ -2,6 +2,7 @@ extends: relaxed
 
 ignore: |
   .pre-commit-config.yaml
+  .terraform/
 
 rules:
   line-length:
